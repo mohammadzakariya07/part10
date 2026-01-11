@@ -31,20 +31,20 @@ footer{text-align:center;margin-top:40px;color:gray;font-size:13px}
 
 <!-- MAIN OPTIONS -->
 <div id="mainOptions">
-  <div class="card" onclick="showUpdateOptions()">Update Aadhaar Card</div>
-  <div class="card" onclick="freshApply()">Fresh Aadhaar Apply</div>
+  <div class="card" id="updateBtn">Update Aadhaar Card</div>
+  <div class="card" id="freshBtn">Fresh Aadhaar Apply</div>
 </div>
 
 <!-- UPDATE OPTIONS -->
 <div id="updateOptions" style="display:none">
 <h3>Select Update Type</h3>
-<button onclick="openUpdate('name')">1. Update Name</button>
-<button onclick="openUpdate('gender')">2. Update Gender</button>
-<button onclick="openUpdate('address')">3. Update Address</button>
-<button onclick="openUpdate('mobile')">4. Update Mobile</button>
-<button onclick="openUpdate('email')">5. Update Email</button>
-<button onclick="openUpdate('biometric')">6. Update Biometrics</button>
-<button onclick="openUpdate('combined')">7. Update Address + Phone + Email + Biometrics</button>
+<button onclick="openUpdate('name')">Update Name</button>
+<button onclick="openUpdate('gender')">Update Gender</button>
+<button onclick="openUpdate('address')">Update Address</button>
+<button onclick="openUpdate('mobile')">Update Mobile</button>
+<button onclick="openUpdate('email')">Update Email</button>
+<button onclick="openUpdate('biometric')">Update Biometrics</button>
+<button onclick="openUpdate('combined')">Update All</button>
 </div>
 
 <!-- POPUP -->
@@ -53,8 +53,8 @@ footer{text-align:center;margin-top:40px;color:gray;font-size:13px}
 <h3 id="popupTitle"></h3>
 <div id="popupBody"></div>
 <br>
-<button onclick="submitData()">Submit</button>
-<button onclick="closePopup()">Cancel</button>
+<button type="button" id="submitBtn">Submit</button>
+<button type="button" onclick="closePopup()">Cancel</button>
 </div>
 </div>
 
@@ -66,178 +66,63 @@ Designed & Developed by <b>Mohammad Zakariya</b><br>
 <script src="dashboard.js"></script>
 
 <script>
+/* ===============================
+   GLOBAL (VERY IMPORTANT)
+================================ */
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbwWw4WdCD4pZw5syqi2jOu_Xfr_FQB5yjfZ3-BhusvxStKDZksCmpPTdPCrr-RRynsy/exec";
 
-let service="",updateType="";
+let service="";
+let updateType="";
 
-/* ===== Update Aadhaar ===== */
+/* ===============================
+   EVENT BINDING (NO INLINE onclick)
+================================ */
+document.getElementById("updateBtn").addEventListener("click", showUpdateOptions);
+document.getElementById("freshBtn").addEventListener("click", freshApply);
+document.getElementById("submitBtn").addEventListener("click", submitData);
+
+/* ===============================
+   FUNCTIONS (GLOBAL SCOPE)
+================================ */
 function showUpdateOptions(){
- document.getElementById("mainOptions").style.display="none";
- document.getElementById("updateOptions").style.display="block";
+  service="Update_Aadhaar_Card";
+  document.getElementById("mainOptions").style.display="none";
+  document.getElementById("updateOptions").style.display="block";
+}
+
+function freshApply(){
+  service="Fresh_Aadhaar_Apply";
+  document.getElementById("popup").style.display="block";
+  document.getElementById("popupTitle").innerText="Fresh Aadhaar Application";
+  document.getElementById("popupBody").innerHTML=`
+    Name:<input id="name">
+    Gender:<select id="gender">
+      <option>Male</option><option>Female</option>
+      <option>Transgender</option><option>Other</option>
+    </select>
+    Address:<textarea id="address"></textarea>
+    Mobile:<input id="mobile">
+    Email:<input id="email">
+  `;
 }
 
 function openUpdate(type){
- service="Updated Aadhaar Card";
- updateType=type;
- document.getElementById("popup").style.display="block";
-
- let html="";
- if(type==="name") html=`Current Name:<input id="old">Updated Name:<input id="new">`;
- if(type==="gender") html=`Current Gender:<select id="old"><option>Male</option><option>Female</option><option>Transgender</option><option>Other</option></select>
- Updated Gender:<select id="new"><option>Male</option><option>Female</option><option>Transgender</option><option>Other</option></select>`;
- if(type==="address") html=`Current Address:<textarea id="old"></textarea>Updated Address:<textarea id="new"></textarea>`;
- if(type==="mobile") html=`Current Mobile or N:<input id="old">Updated Mobile:<input id="new">`;
- if(type==="email") html=`Current Email or N:<input id="old">Updated Email:<input id="new">`;
- if(type==="biometric") html=`<input type="checkbox" value="Fingerprint"> Fingerprint
- <input type="checkbox" value="Photo"> Photo
- <input type="checkbox" value="Iris"> Iris`;
- if(type==="combined") html=`Updated Address:<textarea id="new"></textarea>
- Updated Mobile:<input>
- Updated Email:<input>
- Biometrics: Fingerprint Photo Iris`;
-
- document.getElementById("popupTitle").innerText="Update Aadhaar";
- document.getElementById("popupBody").innerHTML=html;
+  updateType=type;
+  document.getElementById("popup").style.display="block";
+  document.getElementById("popupTitle").innerText="Update Aadhaar";
+  document.getElementById("popupBody").innerHTML=`
+    Old Value:<input id="old">
+    New Value:<input id="new">
+  `;
 }
 
-/* ===== Fresh Aadhaar ===== */
-function freshApply(){
- service="Fresh Aadhaar Apply";
- document.getElementById("popup").style.display="block";
- document.getElementById("popupTitle").innerText="Fresh Aadhaar Application";
- document.getElementById("popupBody").innerHTML=`
- Name:<input id="name">
- Gender:<select id="gender"><option>Male</option><option>Female</option><option>Transgender</option><option>Other</option></select>
- Address:<textarea id="address"></textarea>
- Mobile:<input id="mobile">
- Email:<input id="email">
- Upload Documents (PDF):<input type="file" accept="application/pdf">
- `;
+function submitData(){
+  alert("Submit working ✔");
 }
 
-/* ===== Submit ===== */
-function submitData() {
-
-  alert("Submit button clicked");
-
-  if (service === "Fresh_Aadhaar_Apply") {
-
-    const name = document.getElementById("name")?.value;
-    const gender = document.getElementById("gender")?.value;
-    const address = document.getElementById("address")?.value;
-    const mobile = document.getElementById("mobile")?.value;
-    const email = document.getElementById("email")?.value;
-
-    if (!name || !mobile) {
-      alert("Name and Mobile are required");
-      return;
-    }
-
-    fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body:
-        "service=" + encodeURIComponent("Fresh_Aadhaar_Apply") +
-        "&name=" + encodeURIComponent(name) +
-        "&gender=" + encodeURIComponent(gender) +
-        "&address=" + encodeURIComponent(address) +
-        "&mobile=" + encodeURIComponent(mobile) +
-        "&email=" + encodeURIComponent(email)
-    })
-    .then(res => res.json())
-    .then(data => {
-      alert("Fresh Aadhaar data saved");
-      closePopup();
-      location.reload();
-    })
-    .catch(err => {
-      alert("Error submitting Fresh Aadhaar");
-      console.error(err);
-    });
-  }
-
-  else if (service === "Update_Aadhaar_Card") {
-
-    const mobile = prompt("Enter registered mobile number");
-
-    if (!mobile) {
-      alert("Mobile number required");
-      return;
-    }
-
-    const oldVal = document.getElementById("old")
-      ? document.getElementById("old").value
-      : "N/A";
-
-    const newVal = document.getElementById("new")
-      ? document.getElementById("new").value
-      : "Multiple";
-
-    fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body:
-        "service=" + encodeURIComponent("Update_Aadhaar_Card") +
-        "&mobile=" + encodeURIComponent(mobile) +
-        "&updateType=" + encodeURIComponent(updateType) +
-        "&oldData=" + encodeURIComponent(oldVal) +
-        "&newData=" + encodeURIComponent(newVal)
-    })
-    .then(res => res.json())
-    .then(data => {
-      alert("Aadhaar update saved");
-      closePopup();
-      location.reload();
-    })
-    .catch(err => {
-      alert("Error submitting Aadhaar update");
-      console.error(err);
-    });
-  }
-
-  else {
-    alert("Service type not set");
-  }
+function closePopup(){
+  document.getElementById("popup").style.display="none";
 }
-
-  /* ---------- UPDATE AADHAAR CARD ---------- */
-  else if (service === "Update_Aadhaar_Card") {
-
-    const mobile = prompt("Enter registered mobile number");
-
-    fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body:
-        "service=" + encodeURIComponent("Update_Aadhaar_Card") +
-        "&mobile=" + encodeURIComponent(mobile) +
-        "&updateType=" + encodeURIComponent(updateType) +
-        "&oldData=" + encodeURIComponent(
-          document.getElementById("old") ? document.getElementById("old").value : "N/A"
-        ) +
-        "&newData=" + encodeURIComponent(
-          document.getElementById("new") ? document.getElementById("new").value : "Multiple"
-        )
-    })
-    .then(res => res.json())
-    .then(() => {
-      alert("Aadhaar update saved successfully");
-      closePopup();
-      location.reload();
-    })
-    .catch(err => {
-      alert("Error saving Aadhaar update");
-      console.error(err);
-    });
-  }
-}
-function closePopup(){document.getElementById("popup").style.display="none";}
 </script>
 
 </body>
