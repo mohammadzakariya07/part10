@@ -118,8 +118,20 @@ function freshApply(){
 /* ===== Submit ===== */
 function submitData() {
 
-  /* ---------- FRESH AADHAAR APPLY ---------- */
+  alert("Submit button clicked");
+
   if (service === "Fresh_Aadhaar_Apply") {
+
+    const name = document.getElementById("name")?.value;
+    const gender = document.getElementById("gender")?.value;
+    const address = document.getElementById("address")?.value;
+    const mobile = document.getElementById("mobile")?.value;
+    const email = document.getElementById("email")?.value;
+
+    if (!name || !mobile) {
+      alert("Name and Mobile are required");
+      return;
+    }
 
     fetch(SCRIPT_URL, {
       method: "POST",
@@ -128,23 +140,69 @@ function submitData() {
       },
       body:
         "service=" + encodeURIComponent("Fresh_Aadhaar_Apply") +
-        "&name=" + encodeURIComponent(document.getElementById("name").value) +
-        "&gender=" + encodeURIComponent(document.getElementById("gender").value) +
-        "&address=" + encodeURIComponent(document.getElementById("address").value) +
-        "&mobile=" + encodeURIComponent(document.getElementById("mobile").value) +
-        "&email=" + encodeURIComponent(document.getElementById("email").value)
+        "&name=" + encodeURIComponent(name) +
+        "&gender=" + encodeURIComponent(gender) +
+        "&address=" + encodeURIComponent(address) +
+        "&mobile=" + encodeURIComponent(mobile) +
+        "&email=" + encodeURIComponent(email)
     })
     .then(res => res.json())
-    .then(() => {
-      alert("Fresh Aadhaar application saved successfully");
+    .then(data => {
+      alert("Fresh Aadhaar data saved");
       closePopup();
       location.reload();
     })
     .catch(err => {
-      alert("Error saving Fresh Aadhaar data");
+      alert("Error submitting Fresh Aadhaar");
       console.error(err);
     });
   }
+
+  else if (service === "Update_Aadhaar_Card") {
+
+    const mobile = prompt("Enter registered mobile number");
+
+    if (!mobile) {
+      alert("Mobile number required");
+      return;
+    }
+
+    const oldVal = document.getElementById("old")
+      ? document.getElementById("old").value
+      : "N/A";
+
+    const newVal = document.getElementById("new")
+      ? document.getElementById("new").value
+      : "Multiple";
+
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body:
+        "service=" + encodeURIComponent("Update_Aadhaar_Card") +
+        "&mobile=" + encodeURIComponent(mobile) +
+        "&updateType=" + encodeURIComponent(updateType) +
+        "&oldData=" + encodeURIComponent(oldVal) +
+        "&newData=" + encodeURIComponent(newVal)
+    })
+    .then(res => res.json())
+    .then(data => {
+      alert("Aadhaar update saved");
+      closePopup();
+      location.reload();
+    })
+    .catch(err => {
+      alert("Error submitting Aadhaar update");
+      console.error(err);
+    });
+  }
+
+  else {
+    alert("Service type not set");
+  }
+}
 
   /* ---------- UPDATE AADHAAR CARD ---------- */
   else if (service === "Update_Aadhaar_Card") {
